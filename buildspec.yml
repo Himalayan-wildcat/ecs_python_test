@@ -7,8 +7,6 @@ phases:
     commands:
       - echo Logging in to AWS ECR ...
       - env
-      - echo -------
-      - COMMIT_SHA_SHORT=$(git rev-parse --short HEAD)
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
@@ -18,3 +16,4 @@ phases:
     commands:
       - echo build completed on $(date)
       - echo Pushing the Docker image ...
+#       - COMMIT_SHA_SHORT=$(git rev-parse --short HEAD)
