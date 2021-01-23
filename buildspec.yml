@@ -4,6 +4,7 @@ phases:
   build:
     commands:
       - echo "build started."
+      - aws ecs get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   post_build:
     commands:
       - echo "build completed."
