@@ -1,26 +1,27 @@
 version: 0.2
 
-env:
-  variables:
-    ECR_BASE_URI: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-    # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
-    TAG: $CODEBUILD_RESOLVED_SOURCE_VERSION
-
+# NOTE(H.hara):
+# The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
 phases:
   pre_build:
     commands:
       - echo Logging in to AWS ECR ...
       - env
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_BASE_URI
+      - |-
+        aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
+        | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com}
   build:
     commands:
       - echo Bulid started on $(date)
       - echo Building the Docker image ...
-      - docker build -t $IMAGE_REPO_NAME:$TAG .
-      - docker tag $IMAGE_REPO_NAME:$TAG $ECR_BASE_URI/$IMAGE_REPO_NAME:$TAG
+      - docker build -t ${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION} .
+      - |-
+        docker tag ${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION} \
+        ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
   post_build:
     commands:
       - echo build completed on $(date)
       - echo Pushing the Docker image ...
-      - docker push $ECR_BASE_URI/$IMAGE_REPO_NAME:$TAG
+      - |-
+        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
 #       - COMMIT_SHA_SHORT=$(git rev-parse --short HEAD)
