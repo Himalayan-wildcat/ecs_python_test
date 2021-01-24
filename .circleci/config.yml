@@ -9,7 +9,9 @@ jobs:
       - image: circleci/node:12.16.1
     steps:
       - checkout
-      - run: echo hello
+      - run: node --version
+      - run: npm --version
+      - run: whoami
 
 workflows:
   test-build-deploy:
