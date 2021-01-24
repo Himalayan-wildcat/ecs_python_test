@@ -2,6 +2,7 @@ version: 0.2
 
 env:
   shell: bash
+  git-credential-helper: yes
 
 # NOTE(h.hara):
 # The details of the environment variables:
@@ -19,7 +20,6 @@ env:
 phases:
   pre_build:
     commands:
-      - env
       - echo -------
       - git branch
       - echo -------
