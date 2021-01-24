@@ -2,30 +2,29 @@ version: 0.2
 
 env:
   shell: bash
-  variables:
-    foo: "bar"
-    fiizz: "buzz"
 
 # NOTE(H.hara):
 # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
 phases:
   pre_build:
     commands:
-      - >-
-        echo foo ${foo}
-        echo fizz ${fizz}
       - echo Logging in to AWS ECR ...
-      - |-
+      - >-
         aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - echo Logging in to Docker hub ...
-      - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
+      - echo ${DOCKER_PWD} | docker login -u ${DOCKER_USER} --password-stdin
+      - >
+        IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
+        ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - echo image_tag ${IMAGE_TAG}
+      - echo ecr_base_uri ${ECR_BASE_URI}
   build:
     commands:
       - echo Bulid started on $(date)
       - echo Building the Docker image ...
       - docker build -t ${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION} .
-      - |-
+      - >-
         docker tag ${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION} \
         ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
   post_build:
