@@ -3,6 +3,19 @@ version: 0.2
 env:
   shell: bash
 
+# NOTE(h.hara):
+# The details of the environment variables:
+#   - AWS-codebuild-defined ones:
+#     - CODEBUILD_WEBHOOK_TRIGGER
+#     - CODEBUILD_RESOLVED_SOURCE_NAME
+#   - user-defined ones:
+#     - IMAGE_REPO_NAME
+#     - AWS_DEFAULT_REGION
+#     - AWS_ACCOUNT_ID
+#     - DOCKER_USER
+#     - DOCKER_PWD
+#
+# Otherwise environment variables are assigned herein.
 phases:
   pre_build:
     commands:
@@ -19,16 +32,21 @@ phases:
       - |
         # NOTE(h.hara):
         # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
+        BRANCH_NAME=${CODEBUILD_WEBHOOK_TRIGGER#branch/}
+        APP_NAME=${BRANCH_NAME}-${IMAGE_REPO_NAME}
         IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
         ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - |
+        echo barnch name -- ${BRANCH_NAME}
+        echo app name -- ${APP_NAME}
   build:
     commands:
       - echo Bulid started on $(date)
       - echo Building the Docker image ...
-      - docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
-      - docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_BASE_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+      - docker build -t ${APP_NAME}:${IMAGE_TAG} .
+      - docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_BASE_URI}/${APP_NAME}:${IMAGE_TAG}
   post_build:
     commands:
       - echo build completed on $(date)
       - echo Pushing the Docker image ...
-      - docker push ${ECR_BASE_URI}/${IMAGE_REPO_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker push ${ECR_BASE_URI}/${APP_NAME}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
