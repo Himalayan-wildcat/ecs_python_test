@@ -39,8 +39,8 @@ phases:
       - echo ${DOCKER_PWD} | docker login -u ${DOCKER_USER} --password-stdin
 
       - |
-        echo branch name ---- ${BRANCH_NAME}
-        echo app name --- ${APP_NAME}
+        echo branch name ------- ${BRANCH_NAME}
+        echo app name ------ ${APP_NAME}
   build:
     commands:
       - echo Bulid started on $(date)
