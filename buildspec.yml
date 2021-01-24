@@ -10,10 +10,14 @@ phases:
       - |-
         aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+        # NOTE(h.hara):
+        # Log in to Docker Hub to pull the images as an authenticated user, NOT as an anonymous user,
+        # to stay off Docker Hub rate limiting.
+        # Cf. https://www.docker.com/increase-rate-limits
       - echo Logging in to Docker hub ...
       - echo ${DOCKER_PWD} | docker login -u ${DOCKER_USER} --password-stdin
       - |
-        # NOTE(H.hara):
+        # NOTE(h.hara):
         # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
         IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
         ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
