@@ -1,14 +1,25 @@
 version: 0.2
 
+env:
+  shell: bash
+  variables:
+    foo: "bar"
+    fiizz: "buzz"
+
 # NOTE(H.hara):
-# The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
+=# The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
 phases:
   pre_build:
     commands:
+      - >-
+        echo foo ${foo}
+        echo fizz ${fizz}
       - echo Logging in to AWS ECR ...
       - |-
         aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - echo Logging in to Docker hub ...
+      - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
   build:
     commands:
       - echo Bulid started on $(date)
