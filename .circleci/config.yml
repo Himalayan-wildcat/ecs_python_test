@@ -3,9 +3,18 @@ version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@6.15.2
 
+jobs:
+  test:
+    docker:
+      - image: circleci/node:12.16.1
+    steps:
+      - checkout
+      - run: echo hello
+
 workflows:
-  build-deploy:
+  test-build-deploy:
     jobs:
+      - test
       - aws-ecr/build-and-push-image:
           context: ecs-test
           account-url: AWS_ECR_ACCOUNT_URL_ENV_VAR_NAME
