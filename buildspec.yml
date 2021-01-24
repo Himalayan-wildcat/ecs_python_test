@@ -21,7 +21,7 @@ phases:
   pre_build:
     commands:
       - echo -------
-      - git branch
+      - git name-rev ${CODEBUILD_RESOLVED_SOURCE_VERSION} | awk '{print $2}'
       - echo -------
       - echo Logging in to AWS ECR ...
       - |-
