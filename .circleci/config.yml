@@ -14,9 +14,9 @@ workflows:
           region: AWS_REGION_ENV_VAR_NAME
           repo: "${CIRCLE_BRANCH}-${CIRCLE_PROJECT_REPONAME}"
           tag: "$CIRCLE_SHA1"
-          docker-login: true
-          dockerhub-username: DOCKERHUB_USERNAME
-          dockerhub-password: DOCKERHUB_PASSWORD
+          # docker-login: true
+          # dockerhub-username: DOCKERHUB_USERNAME
+          # dockerhub-password: DOCKERHUB_PASSWORD
           filters:
             branches:
               only:
