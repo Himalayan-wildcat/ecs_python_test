@@ -37,6 +37,7 @@ phases:
         IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
         ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - |
+        echo codebuild webhook trigger ${CODEBUILD_WEBHOOK_TRIGGER}
         echo barnch name -- ${BRANCH_NAME}
         echo app name -- ${APP_NAME}
   build:
