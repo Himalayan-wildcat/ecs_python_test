@@ -1,0 +1,24 @@
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@6.15.2
+
+workflows:
+  build-deploy:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          context: ecs-test
+          account-url: AWS_ECR_ACCOUNT_URL_ENV_VAR_NAME
+          aws-access-key-id: AWS_ACCESS_KEY_ID_ENV_VAR_NAME
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY_ENV_VAR_NAME
+          region: AWS_REGION_ENV_VAR_NAME
+          repo: "${CIRCLE_BRANCH}-${CIRCLE_PROJECT_REPONAME}"
+          tag: "$CIRCLE_SHA1"
+          # docker-login: true
+          # dockerhub-username: DOCKERHUB_USERNAME
+          # dockerhub-password: DOCKERHUB_PASSWORD
+          filters:
+            branches:
+              only:
+                - dev
+                - main
