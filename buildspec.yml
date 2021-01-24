@@ -20,9 +20,13 @@ env:
 phases:
   pre_build:
     commands:
-      - echo -------
-      - git name-rev ${CODEBUILD_RESOLVED_SOURCE_VERSION} | awk '{print $2}'
-      - echo -------
+      - |
+        # NOTE(h.hara):
+        # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
+        BRANCH_NAME=$(git name-rev ${CODEBUILD_RESOLVED_SOURCE_VERSION} | awk '{print $2}')
+        APP_NAME=${BRANCH_NAME}-${IMAGE_REPO_NAME}
+        IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
+        ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - echo Logging in to AWS ECR ...
       - |-
         aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
@@ -33,16 +37,9 @@ phases:
         # Cf. https://www.docker.com/increase-rate-limits
       - echo Logging in to Docker hub ...
       - echo ${DOCKER_PWD} | docker login -u ${DOCKER_USER} --password-stdin
+
       - |
-        # NOTE(h.hara):
-        # The env var 'CODEBUILD_RESOLVED_SOURCE_VERSION' is provided by AWS codebuild.
-        BRANCH_NAME=${CODEBUILD_WEBHOOK_TRIGGER#branch/}
-        APP_NAME=${BRANCH_NAME}-${IMAGE_REPO_NAME}
-        IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
-        ECR_BASE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
-      - |
-        echo codebuild webhook trigger ${CODEBUILD_WEBHOOK_TRIGGER}
-        echo barnch name -- ${BRANCH_NAME}
+        echo branch name -- ${BRANCH_NAME}
         echo app name -- ${APP_NAME}
   build:
     commands:
